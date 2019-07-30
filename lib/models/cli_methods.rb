@@ -31,23 +31,16 @@ class CommandLineInterface
             end
     end
 
-    game_title = PROMPT.ask("Please enter the title you would like to view:")
+    exit_program = ""
 
-    # game_title = gets.chomp
-    # binding.pry
-    # 0
-    Game.game_select(game_title)
+        until exit_program == "exit" do
+            game_title = PROMPT.ask("Please enter the title you would like to view:")
 
-    # game_name = gets.chomp
-
-    # search_games(game_name)
-
-    # number = gets.chomp
-
-    # game_select = search_games(game_name)[number].values[0]
-    # game_platform = search_games(game_name)[number].values[1]
-
-    # game_detail(game_select, game_platform)
+            # binding.pry
+            # 0
+            Game.game_select(game_title)
+            exit_program = PROMPT.ask("To exit, type 'exit'; otherwise, type anything else to look through more titles.")
+        end
     end  #code to end program
 end
 

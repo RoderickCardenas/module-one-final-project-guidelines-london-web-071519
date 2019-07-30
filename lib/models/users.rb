@@ -28,4 +28,8 @@ class User < ActiveRecord::Base
     def average_rating
         self.rating_array.sum / self.num_reviews
     end
+
+    def delete_last_review
+        self.reviews.last.destroy
+    end
 end

@@ -34,8 +34,8 @@ class Game < ActiveRecord::Base
     end
 
     def self.game_select(game_title)
-        binding.pry
-        0
+        # binding.pry
+        # 0
         puts_var = self.all.select{|game| game.title.upcase.include?(game_title.upcase)}[0].title
         puts puts_var 
         if puts_var == []
