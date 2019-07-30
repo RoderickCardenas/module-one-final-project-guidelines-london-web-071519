@@ -21,7 +21,7 @@ require 'uri'
             end
         end
     }.compact[0]
-end
+    end
 
 #     def game_detail(game_title, game_platform)
 #         response = Unirest.get "https://chicken-coop.p.rapidapi.com/games/#{URI.encode(game_title)}?platform=#{URI.encode(game_platform)}",

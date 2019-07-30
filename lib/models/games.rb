@@ -28,4 +28,19 @@ class Game < ActiveRecord::Base
     def average_rating
         self.rating_array.sum / self.num_reviews
     end
+
+    def self.all_games
+        self.all.map{|game| game.title}
+    end
+
+    def self.game_select(game_title)
+        binding.pry
+        0
+        puts_var = self.all.select{|game| game.title.upcase.include?(game_title.upcase)}[0].title
+        puts puts_var 
+        if puts_var == []
+            puts "Sorry, we don't seem to have that game in our database"
+        end
+        puts_var
+    end
 end

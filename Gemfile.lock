@@ -88,6 +88,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  activerecord
   faker
   json
   pry
