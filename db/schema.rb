@@ -22,7 +22,7 @@ ActiveRecord::Schema.define(version: 3) do
   create_table "reviews", force: :cascade do |t|
     t.integer "game_id"
     t.integer "user_id"
-    t.string  "content"
+    t.string "content"
     t.integer "rating"
     t.index ["game_id"], name: "index_reviews_on_game_id"
     t.index ["user_id"], name: "index_reviews_on_user_id"

@@ -8,3 +8,6 @@ gem "require_all"
 gem 'unirest'
 gem 'json'
 gem 'rest-client'
+gem 'rake'
+gem 'faker'
+gem 'tty-prompt'
