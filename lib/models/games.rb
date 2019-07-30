@@ -34,13 +34,15 @@ class Game < ActiveRecord::Base
     end
 
     def self.game_select(game_title)
-        # binding.pry
-        # 0
-        puts_var = self.all.select{|game| game.title.upcase.include?(game_title.upcase)}[0].title
-        puts puts_var 
-        if puts_var == []
-            puts "Sorry, we don't seem to have that game in our database"
+        self.all.each do |game|
+            # binding.pry
+            # 0
+            if game.title.upcase.upcase.include?(game_title.upcase)
+                puts_var = self.all.select{|game| game.title.upcase.include?(game_title.upcase)}[0].title
+                puts puts_var 
+                return puts_var
+            end
         end
-        puts_var
+        puts "Sorry, we don't seem to have that game in our database"
     end
 end
