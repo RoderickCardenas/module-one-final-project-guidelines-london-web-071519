@@ -12,4 +12,4 @@ require_relative '../lib/game_api'
 
 cli = CommandLineInterface.new
 
-cli.run
+    cli.run
