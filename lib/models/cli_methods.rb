@@ -220,6 +220,9 @@ end
         puts "#{review.game.title} | #{review.game.genre}"
             content = PROMPT.ask("Start writing your review for this game.")
             rating = PROMPT.ask("What would you rate this game out of 10?")
+            while rating.to_i > 10 || rating.length > 3 || rating.to_i < 1
+                rating = PROMPT.ask("The rating has to be out of 10, What would you rate this game out of 10?")
+            end
             Review.create(game_id: review.game.id, user_id: @current_user.id, content: content, rating: rating)
             reload_user
             new_review = @current_user.reviews.last
@@ -240,6 +243,9 @@ end
         puts "Title: #{review.game.title} | Genre: #{review.game.genre} | Content: #{review.content} | #{review.rating}"
         review.content = PROMPT.ask("Start writing your review for this game.")
         review.rating = PROMPT.ask("What would you rate this game out of 10?")
+        while review.rating.to_i > 10 || review.rating.length > 3 || review.rating.to_i < 1
+            review.rating = PROMPT.ask("The rating has to be out of 10, What would you rate this game out of 10?")
+        end
         new_review = review
         new_review.save
         puts "", "Great, here are your newly edited review", "", "Title: #{new_review.game.title} | #{new_review.game.genre} | #{new_review.content} | #{new_review.rating}/10"
