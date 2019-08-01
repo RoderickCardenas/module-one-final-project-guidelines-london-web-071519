@@ -5,25 +5,6 @@ class User < ActiveRecord::Base
         self.reviews.sort_by{|rev| rev.rating}.reverse
     end
 
-    # def self.login
-    #     username = PROMPT.ask("Please enter your username", required: true)
-    #     if User.find_by username: username
-    #         current_user = User.find_by username: username
-    #         # binding.pry
-    #         # 0
-    #     else 
-    #         puts "Username not recognized, please create an account"
-    #         current_user = Self.create_account
-    #     end
-    #     current_user
-    # end
-
-    def my_games
-        self.games.each do |game|
-            puts "Title: #{game.title} | Genre: #{game.genre}"
-        end
-    end
-
     def my_reviews
         Game.all.each do |game|
             self.reviews.each do |review|
@@ -48,24 +29,6 @@ class User < ActiveRecord::Base
         to_update.save
         puts "#{self.reviews.last.game_id} | #{self.reviews.last.user_id} | #{self.reviews.last.content} | #{self.reviews.last.rating}"
     end
-    
-    def self.create_account
-        name = PROMPT.ask("Please enter your name")
-        puts ""
-        username = PROMPT.ask("Now enter your desired username")
-        puts ""
-            while User.find_by username: username
-                puts "This user already exists, please choose another username"
-                puts ""
-                name = PROMPT.ask("Please enter your name")
-                puts ""
-                username = PROMPT.ask("Now enter your desired username")
-                puts ""
-            end
-                User.create(name: name, username: username)
-                current_user = User.all.last
-        current_user
-    end
 
     # def change_username
 
@@ -84,12 +47,7 @@ class User < ActiveRecord::Base
         Review.all.find_by user_id: num = PROMPT.ask("Which Review by ID number would you like to change?")
     end
 
-    # def user_menu
-    #     PROMPT.select("You are now logged in as #{self.username}, What would you like to do?", %w(Games Reviews))
-    # end
-
     def top_3_reviews
-        binding.pry
         reviews_rating_best_to_worst.max_by(3) {|rev| rev.rating}
     end
 

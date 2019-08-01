@@ -1,14 +1,9 @@
 class Game < ActiveRecord::Base
     has_many :reviews
     has_many :users, through: :reviews
+    
     def reviews_rating_best_to_worst
         self.reviews.sort_by{|rev| rev.rating}.reverse
-    end
-
-    def self.here_are_all_games
-        self.all.each do |game|
-        puts "Game ID: #{game.id}, Title: #{game.title}, Genre: #{game.genre}"
-        end
     end
     
     def reviews_rating_worst_to_best
