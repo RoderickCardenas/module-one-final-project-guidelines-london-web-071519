@@ -88,7 +88,7 @@ class CommandLineInterface
 ############
 
 def reload_user
-    @current_user.reviews.reload
+    @current_user.reload
 end
 
 def my_games
@@ -201,21 +201,31 @@ end
     def select_to_review
         options = []
         search_games.each do |review|
-        options << {"Title: #{review.game.title}, Genre: #{review.game.genre}" => -> do selected_to_review(review) end}
+        options << {"Title: #{review.game.title}, Genre: #{review.game.genre}" => -> do validate_to_review(review) end}
         end
         PROMPT.select("Select the game you would like to review", options, filter: true)
     end
 
+    def validate_to_review(review)
+        @current_user.games.each do |game|
+            if game.id == review.game_id
+                puts "", "You have already reviewed this game! You can edit your review from the main menu", ""
+                view_main_menu_logged_in
+            end
+        end
+        selected_to_review(review)
+    end
+
     def selected_to_review(review)
         puts "#{review.game.title} | #{review.game.genre}"
-        content = PROMPT.ask("Start writing your review for this game.")
-        rating = PROMPT.ask("What would you rate this game out of 10?")
-        Review.create(game_id: review.game.id, user_id: @current_user.id, content: content, rating: rating)
-        reload_user
-        new_review = @current_user.reviews.last
-        puts "", "Thanks for letting the community know what's what!", "" 
-        puts "Title: #{new_review.game.title} | #{new_review.game.genre} | #{new_review.content} | #{new_review.rating}/10"
-        view_main_menu_logged_in
+            content = PROMPT.ask("Start writing your review for this game.")
+            rating = PROMPT.ask("What would you rate this game out of 10?")
+            Review.create(game_id: review.game.id, user_id: @current_user.id, content: content, rating: rating)
+            reload_user
+            new_review = @current_user.reviews.last
+            puts "", "Thanks for letting the community know what's what!", "" 
+            puts "Title: #{new_review.game.title} | #{new_review.game.genre} | #{new_review.content} | #{new_review.rating}/10"
+            view_main_menu_logged_in
     end
 
     def select_to_edit
