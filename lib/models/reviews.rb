@@ -3,7 +3,7 @@ class Review < ActiveRecord::Base
     belongs_to :game
     
     def self.perfect_ratings
-        self.all.select{|review| review.rating > 9}
+        Review.all.select{|review| review.rating == 10}
     end
 
     def self.every_unique_game
@@ -15,15 +15,15 @@ class Review < ActiveRecord::Base
     end
 
     def self.worst_ratings
-        self.all.select{|review| review.rating < 2}
+        Review.all.select{|review| review.rating == 1}
     end
 
     def self.worst_to_best
-        self.all.sort_by{|review| review.rating}
+        Review.all.sort_by{|review| review.rating}
     end
 
     def self.best_to_worst
-        self.all.sort_by{|review| review.rating}
+        Review.all.sort_by{|review| review.rating}
     end
 
     def grab_game_from_review

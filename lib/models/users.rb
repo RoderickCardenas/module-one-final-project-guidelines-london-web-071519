@@ -5,34 +5,10 @@ class User < ActiveRecord::Base
         self.reviews.sort_by{|rev| rev.rating}.reverse
     end
 
-    def my_reviews
-        Game.all.each do |game|
-            self.reviews.each do |review|
-                if review.game_id == game.id
-                    puts "Title: #{game.title} | Content: '#{review.content}' | Rating: #{review.rating}/10"
-                end
-            end
-        end
-    end
-
     def delete_last_review
-        self.reviews.last.destroy_all
+        self.reviews.last.destroy
         Reviews.update
-        Self.reviews.update
     end
-
-    def update_last
-        to_update = self.reviews.last
-        to_update.content = PROMPT.ask("What would you like your new content to say?")
-        to_update.rating = PROMPT.ask("What would you like your new rating for this game to be?")
-        # binding.pry
-        to_update.save
-        puts "#{self.reviews.last.game_id} | #{self.reviews.last.user_id} | #{self.reviews.last.content} | #{self.reviews.last.rating}"
-    end
-
-    # def change_username
-
-    # end
 
     def all_reviews
         Reviews.all
