@@ -6,10 +6,14 @@ class CommandLineInterface
 
     def current_user
             username = PROMPT.ask("Please enter your username", required: true)
+            puts ""
         if User.find_by username: username
             @current_user = User.find_by username: username
+            view_main_menu_logged_in
+        else
+            puts "", "Incorred username or does not exist! Please create an account or try again ^_^", ""
+            main_menu
         end
-        cli_options
     end
 
     def create_account
@@ -25,7 +29,7 @@ class CommandLineInterface
                 User.create(name: name, username: username)
                 @current_user = User.all.last
         @current_user
-        cli_options
+        view_main_menu_logged_in
     end
 
 #The run method is here
@@ -48,76 +52,36 @@ class CommandLineInterface
             {"Create a new account" => -> do create_account end},
             {"View Games" => -> do here_are_all_games_not_logged end},
             {"View Reviews" => -> do here_are_all_the_reviews_not_logged end},
-            {"View the top rated games" => -> do top_three && main_menu end},
-            {"View the worst games" => -> do bottom_three && main_menu end},
-            {"View the games that scored a perfect rating!" => -> do perfect_games end},
-            {"View the games that scored the worst rating!" => -> do trash_games end},
+            {"View the top rated games" => -> do top_three_not_logged end},
+            {"View the worst games" => -> do bottom_three_not_logged end},
+            {"View the games that scored a perfect rating!" => -> do perfect_games_not_logged end},
+            {"View the games that scored the worst rating!" => -> do trash_games_not_logged end},
             {"Exit" => -> do exit_app end}   
         ]
         PROMPT.select("Please choose your login type, feel free to browse reviews/games", options, per_page: 4) 
     end
 
-    def cli_options
-        options = [
-            {"View Games" => -> do view_games_logged_in && cli_options end},
-            {"View Reviews" => -> do view_reviews_logged_in && cli_options end},
-            {"Edit your reviews" => -> do editing_options end},
-            {"Delete your own reviews" => -> do delete_reviews end},
-            {"Change your username" => -> do change_username end},
-            {"Logout and exit" => -> do exit_app end}   
-        ]
-        PROMPT.select("What would you like to do?", options, filter: true)
-    end
-
-    def delete_reviews
-        options = [
-
-            {"View Reviews" => -> do view_reviews_logged_in && cli_options end},
-            {"Return to account menu" => -> do cli_options end},
-            {"Logout and exit" => -> do exit_app end} 
-        ]
-        PROMPT.select("What would you review would you like to delete?", options)
-    end
-
-    def view_games_logged_in
+    def view_main_menu_logged_in
         # binding.pry
         # 0
         options = [
             {"View all games" => -> do here_are_all_games end},
-            {"Select a game to review" => -> do select_to_review && view_games_logged_in end},
-            {"View your collection of games that you have reviewed" => -> do my_games && view_games_logged_in end},
-            {"View the top rated games" => -> do top_three && view_games_logged_in end},
-            {"View the worst games" => -> do bottom_three && view_games_logged_in end},
-            {"Return to home menu" => -> do cli_options && view_games_logged_in end},
-            {"Logout and exit" => -> do exit_app end} 
-        ]
-        PROMPT.select("Please select from the following:", options) 
-
-
-    end
-
-    def view_reviews_logged_in
-        options = [
             {"View all reviews" => -> do here_are_all_the_reviews end},
-            {"View your reviews" => -> do my_reviews end},
-            {"Select a game to review" => -> do select_to_review && view_games_logged_in end},
+            {"Select a game to review" => -> do select_to_review end},
+            {"View your collection of games that you have reviewed" => -> do my_games end},
+            {"View the top rated games" => -> do top_three end},
+            {"View the worst games" => -> do bottom_three end},
             {"View the games that scored a perfect rating!" => -> do perfect_games end},
             {"View the games that scored the worst rating!" => -> do trash_games end},
-            {"Return to home menu" => -> do cli_options end},
-            {"Logout and exit" => -> do exit_app end} 
-        ]
-        PROMPT.select("Please select from the following:", options) 
-    end
-
-    def editing_options
-        options = [
+            {"View your reviews" => -> do my_reviews end},
+            {"Select a game to review" => -> do select_to_review end},
             {"Edit your last review" => -> do update_last end},
             {"Choose the review you would like to edit" => -> do select_to_edit end},
-            {"Delete last review entry" => -> do @current_user.delete_last_review && my_reviews end},
-            {"Return to home menu" => -> do cli_options end},
-            {"Logout and exit" => -> do exit_app end}    
+            {"Delete last review entry" => -> do @current_user.delete_last_review end},
+            {"Change your username" => -> do change_username end},
+            {"Logout and exit" => -> do exit_app end} 
         ]
-        PROMPT.select("Please select from the following:", options) 
+        PROMPT.select("Please select from the following:", options, per_page: 4) 
     end
 
 ###########################
@@ -127,13 +91,26 @@ def my_games
     @current_user.games.each do |game|
         puts "Title: #{game.title} | Genre: #{game.genre}"
     end
+    view_main_menu_logged_in
 end
 
 def my_reviews
     @current_user.reviews.each do |review|
         puts "Title: #{review.game.title} |Genre: #{review.game.genre} | Review: #{review.content} | Rating #{review.rating}"
     end
-    cli_options
+    view_main_menu_logged_in
+end
+
+def change_username
+    username = PROMPT.ask("Please enter the new username you would like to have")
+    while User.find_by username: username
+        puts "", "This user already exists, please choose another username", ""
+        username = PROMPT.ask("Please enter the new username you would like to have")
+        puts ""
+    end
+    @current_user.username = username
+    @current_user.save
+    view_main_menu_logged_in
 end
 
 def update_last
@@ -142,7 +119,7 @@ def update_last
     to_update.rating = PROMPT.ask("What would you like your new rating for this game to be?")
     to_update.save
     puts ", ""Title: #{to_update.game.title} | #{to_update.game.genre} | #{to_update.content} | #{to_update.rating}", ""
-    cli_options
+    view_main_menu_logged_in
 end
 
 ############
@@ -151,6 +128,7 @@ end
     # Here are the methods regarding reviews
     def here_are_all_the_reviews
         Review.all.each{|review| puts "Title: #{review.game.title}, Content: '#{review.content}', Rating: #{review.rating}/10"}
+        view_main_menu_logged_in
     end
 
     def here_are_all_the_reviews_not_logged
@@ -160,24 +138,53 @@ end
 
     def perfect_games
         Review.perfect_ratings.each{|rev| puts "Title: #{rev.game.title} | Content: '#{rev.content}' | Rating: #{rev.rating}/10!"}
-        cli_options
+        view_main_menu_logged_in
     end
 
     def trash_games
         Review.worst_ratings.each {|rev| puts "Title: #{rev.game.title} | Content: '#{rev.content}' | Rating: #{rev.rating}/10!"}
+        view_main_menu_logged_in
     end
 
     def top_three
         Review.top_3.each{|review| puts "", "Title: #{review.game.title} | Content: '#{review.content}' | Rating: #{review.rating}/10!", ""}
+        view_main_menu_logged_in
     end
 
     def bottom_three
         Review.bottom_3.each{|review| puts "", "Title: #{review.game.title} | Content: '#{review.content}' | Rating: #{review.rating}/10!", ""}
+        view_main_menu_logged_in
+    end
+
+    #
+
+    def perfect_games_not_logged
+        Review.perfect_ratings.each{|rev| puts "Title: #{rev.game.title} | Content: '#{rev.content}' | Rating: #{rev.rating}/10!"}
+        main_menu
+    end
+
+    def trash_games_not_logged
+        Review.worst_ratings.each {|rev| puts "Title: #{rev.game.title} | Content: '#{rev.content}' | Rating: #{rev.rating}/10!"}
+        main_menu
+    end
+
+    def top_three_not_logged
+        Review.top_3.each{|review| puts "", "Title: #{review.game.title} | Content: '#{review.content}' | Rating: #{review.rating}/10!", ""}
+        main_menu
+    end
+
+    def bottom_three_not_logged
+        Review.bottom_3.each{|review| puts "", "Title: #{review.game.title} | Content: '#{review.content}' | Rating: #{review.rating}/10!", ""}
+        main_menu
     end
 
     def here_are_all_games
         Review.every_unique_game.each{|review| puts "", "Game ID: #{review.game.id}, Title: #{review.game.title}, Genre: #{review.game.genre}", ""}.uniq
-        cli_options
+        view_main_menu_logged_in
+    end
+
+    def search_games
+        Review.every_unique_game.each{|review| puts "", "Game ID: #{review.game.id}, Title: #{review.game.title}, Genre: #{review.game.genre}", ""}.uniq
     end
 
     def here_are_all_games_not_logged
@@ -187,7 +194,7 @@ end
 
     def select_to_review
         options = []
-        here_are_all_games.each do |review|
+        search_games.each do |review|
         options << {"Title: #{review.game.title}, Genre: #{review.game.genre}" => -> do selected_to_review(review) end}
         end
         PROMPT.select("Select the game you would like to review", options, filter: true)
@@ -200,7 +207,7 @@ end
         Review.create(game_id: review.game.id, user_id: @current_user.id, content: content, rating: rating)
         new_review = @current_user.reviews.last
         puts "", "Thanks for letting the community know what's what!", "", "Title: #{new_review.game.title} | #{new_review.game.genre} | #{new_review.content} | #{new_review.rating}/10"
-        cli_options
+        view_main_menu_logged_in
     end
 
     def select_to_edit
@@ -218,7 +225,7 @@ end
         new_review = review
         new_review.save
         puts "", "Great, here are your newly edited review", "", "Title: #{new_review.game.title} | #{new_review.game.genre} | #{new_review.content} | #{new_review.rating}/10"
-        cli_options
+        view_main_menu_logged_in
     end
 #
 #########
