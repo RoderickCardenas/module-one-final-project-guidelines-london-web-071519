@@ -77,7 +77,7 @@ class CommandLineInterface
             {"Select a game to review" => -> do select_to_review end},
             {"Edit your last review" => -> do update_last end},
             {"Choose the review you would like to edit" => -> do select_to_edit end},
-            {"Delete last review entry" => -> do @current_user.delete_last_review end},
+            {"Select a review that you would like to delete (cannot be reversed!)" => -> do select_to_delete end},
             {"Change your username" => -> do change_username end},
             {"Logout and exit" => -> do exit_app end} 
         ]
@@ -87,16 +87,20 @@ class CommandLineInterface
 ###########################
 ############
 
+def reload_user
+    @current_user.reviews.reload
+end
+
 def my_games
     @current_user.games.each do |game|
-        puts "Title: #{game.title} | Genre: #{game.genre}"
+        puts "", "Title: #{game.title} | Genre: #{game.genre}", ""
     end
     view_main_menu_logged_in
 end
 
 def my_reviews
     @current_user.reviews.each do |review|
-        puts "Title: #{review.game.title} |Genre: #{review.game.genre} | Review: #{review.content} | Rating #{review.rating}"
+        puts "", "Title: #{review.game.title} |Genre: #{review.game.genre} | Review: #{review.content} | Rating #{review.rating}", ""
     end
     view_main_menu_logged_in
 end
@@ -116,7 +120,9 @@ end
 def update_last
     to_update = @current_user.reviews.last
     to_update.content = PROMPT.ask("What would you like your new content to say?")
+    puts ""
     to_update.rating = PROMPT.ask("What would you like your new rating for this game to be?")
+    puts ""
     to_update.save
     puts ", ""Title: #{to_update.game.title} | #{to_update.game.genre} | #{to_update.content} | #{to_update.rating}", ""
     view_main_menu_logged_in
@@ -127,22 +133,22 @@ end
 
     # Here are the methods regarding reviews
     def here_are_all_the_reviews
-        Review.all.each{|review| puts "Title: #{review.game.title}, Content: '#{review.content}', Rating: #{review.rating}/10"}
+        Review.all.each{|review| puts "", "Title: #{review.game.title}, Content: '#{review.content}', Rating: #{review.rating}/10", ""}
         view_main_menu_logged_in
     end
 
     def here_are_all_the_reviews_not_logged
-        Review.all.each{|review| puts "Title: #{review.game.title}, Content: '#{review.content}', Rating: #{review.rating}/10"}
+        Review.all.each{|review| puts "", "Title: #{review.game.title}, Content: '#{review.content}', Rating: #{review.rating}/10", ""}
         main_menu
     end
 
     def perfect_games
-        Review.perfect_ratings.each{|rev| puts "Title: #{rev.game.title} | Content: '#{rev.content}' | Rating: #{rev.rating}/10!"}
+        Review.perfect_ratings.each{|rev| puts "", "Title: #{rev.game.title} | Content: '#{rev.content}' | Rating: #{rev.rating}/10!", ""}
         view_main_menu_logged_in
     end
 
     def trash_games
-        Review.worst_ratings.each {|rev| puts "Title: #{rev.game.title} | Content: '#{rev.content}' | Rating: #{rev.rating}/10!"}
+        Review.worst_ratings.each {|rev| puts "", "Title: #{rev.game.title} | Content: '#{rev.content}' | Rating: #{rev.rating}/10!", ""}
         view_main_menu_logged_in
     end
 
@@ -159,12 +165,12 @@ end
     #
 
     def perfect_games_not_logged
-        Review.perfect_ratings.each{|rev| puts "Title: #{rev.game.title} | Content: '#{rev.content}' | Rating: #{rev.rating}/10!"}
+        Review.perfect_ratings.each{|rev| puts "", "Title: #{rev.game.title} | Content: '#{rev.content}' | Rating: #{rev.rating}/10!", ""}
         main_menu
     end
 
     def trash_games_not_logged
-        Review.worst_ratings.each {|rev| puts "Title: #{rev.game.title} | Content: '#{rev.content}' | Rating: #{rev.rating}/10!"}
+        Review.worst_ratings.each {|rev| puts "", "Title: #{rev.game.title} | Content: '#{rev.content}' | Rating: #{rev.rating}/10!", ""}
         main_menu
     end
 
@@ -205,8 +211,10 @@ end
         content = PROMPT.ask("Start writing your review for this game.")
         rating = PROMPT.ask("What would you rate this game out of 10?")
         Review.create(game_id: review.game.id, user_id: @current_user.id, content: content, rating: rating)
+        reload_user
         new_review = @current_user.reviews.last
-        puts "", "Thanks for letting the community know what's what!", "", "Title: #{new_review.game.title} | #{new_review.game.genre} | #{new_review.content} | #{new_review.rating}/10"
+        puts "", "Thanks for letting the community know what's what!", "" 
+        puts "Title: #{new_review.game.title} | #{new_review.game.genre} | #{new_review.content} | #{new_review.rating}/10"
         view_main_menu_logged_in
     end
 
@@ -225,6 +233,23 @@ end
         new_review = review
         new_review.save
         puts "", "Great, here are your newly edited review", "", "Title: #{new_review.game.title} | #{new_review.game.genre} | #{new_review.content} | #{new_review.rating}/10"
+        view_main_menu_logged_in
+    end
+
+    def select_to_delete
+        options = []
+        @current_user.reviews.each do |review|
+        options << {"Title: #{review.game.title} | Genre: #{review.game.genre} | Content: #{review.content} | #{review.rating}" => -> do selected_to_delete(review) end}
+        end
+        PROMPT.select("Select the game you would like to review", options, filter: true)
+    end
+
+    def selected_to_delete(review)
+        puts "Title: #{review.game.title} | Genre: #{review.game.genre} | Content: #{review.content} | #{review.rating}"
+        new_review = review
+        new_review.destroy
+        puts "Your review has been deleted! Hope you meant to do that o_0"
+        @current_user.reviews.reload
         view_main_menu_logged_in
     end
 #
