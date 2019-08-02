@@ -37,6 +37,7 @@ class CommandLineInterface
 #
 #
     def run
+        Catpix::print_image("lib/pixel_images/Gamer_JunkFood4.png")
         main_menu
     end
 #
@@ -67,13 +68,12 @@ class CommandLineInterface
         options = [
             {"View all games" => -> do here_are_all_games end},
             {"View all reviews" => -> do here_are_all_the_reviews end},
+            {"View your reviews for games in your collection" => -> do my_games end},
             {"Select a game to review" => -> do select_to_review end},
-            {"View your collection of games that you have reviewed" => -> do my_games end},
             {"View the top rated games" => -> do top_three end},
             {"View the worst games" => -> do bottom_three end},
             {"View the games that scored a perfect rating!" => -> do perfect_games end},
             {"View the games that scored the worst rating!" => -> do trash_games end},
-            {"View your reviews" => -> do my_reviews end},
             {"Select a game to review" => -> do select_to_review end},
             {"Edit your last review" => -> do update_last end},
             {"Choose the review you would like to edit" => -> do select_to_edit end},
@@ -133,12 +133,25 @@ end
 
     # Here are the methods regarding reviews
     def here_are_all_the_reviews
-        Review.all.each{|review| puts "", "Title: #{review.game.title}, Content: '#{review.content}', Rating: #{review.rating}/10", ""}
-        view_main_menu_logged_in
+        Game.all.each{|game| 
+            i = 1
+                puts "", "Title: #{game.title}", ""
+            game.reviews.each{|review|
+                puts "#{i}. Content: '#{review.content}', Rating: #{review.rating}/10"
+                i += 1
+            }}
+            puts ""
     end
 
     def here_are_all_the_reviews_not_logged
-        Review.all.each{|review| puts "", "Title: #{review.game.title}, Content: '#{review.content}', Rating: #{review.rating}/10", ""}
+        Game.all.each{|game| 
+            i = 1
+                puts "", "Title: #{game.title}", ""
+            game.reviews.each{|review|
+                puts "#{i}. Content: '#{review.content}', Rating: #{review.rating}/10"
+                i += 1
+            }}
+            puts ""
         main_menu
     end
 
@@ -243,7 +256,7 @@ end
         puts "Title: #{review.game.title} | Genre: #{review.game.genre} | Content: #{review.content} | #{review.rating}"
         review.content = PROMPT.ask("Start writing your review for this game.")
         review.rating = PROMPT.ask("What would you rate this game out of 10?")
-        while review.rating.to_i > 10 || review.rating.length > 3 || review.rating.to_i < 1
+        while review.rating > 10 || review.rating.length > 3 || review.rating < 1
             review.rating = PROMPT.ask("The rating has to be out of 10, What would you rate this game out of 10?")
         end
         new_review = review
@@ -264,7 +277,7 @@ end
         puts "Title: #{review.game.title} | Genre: #{review.game.genre} | Content: #{review.content} | #{review.rating}"
         new_review = review
         new_review.destroy
-        puts "Your review has been deleted! Hope you meant to do that o_0"
+        puts "", "Your review has been deleted! Hope you meant to do that o_0", ""
         @current_user.reviews.reload
         view_main_menu_logged_in
     end
@@ -273,9 +286,8 @@ end
 # Here ends the methods calling Review class
 
     def exit_app
-        puts ""
-        puts "We hope you to see you again soon!"
-        puts ""
+        Catpix::print_image("lib/pixel_images/kirby_bye.png")
+        puts "", "We hope you to see you again soon!", ""
         exit!
     end
 end

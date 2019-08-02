@@ -5,6 +5,10 @@ class Review < ActiveRecord::Base
     def self.perfect_ratings
         Review.all.select{|review| review.rating == 10}
     end
+    
+    # def self.every_review_for_game
+    #     binding.pry
+    # end
 
     def self.every_unique_game
         Review.all.uniq{|review| review.game_id}

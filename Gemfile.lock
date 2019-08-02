@@ -15,8 +15,14 @@ GEM
     addressable (2.6.0)
       public_suffix (>= 2.0.2, < 4.0)
     arel (9.0.0)
+    catpix (0.2.0)
+      docopt (~> 0.5, >= 0.5.0)
+      rmagick (~> 2.15, >= 2.15.2)
+      ruby-terminfo (~> 0.1, >= 0.1.1)
+      tco (~> 0.1, >= 0.1.8)
     coderay (1.1.2)
     concurrent-ruby (1.1.5)
+    docopt (0.6.1)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
     equatable (0.6.1)
@@ -31,6 +37,7 @@ GEM
     mime-types (3.2.2)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2019.0331)
+    mini_magick (4.9.5)
     minitest (5.11.3)
     mustermann (1.0.3)
     necromancer (0.5.0)
@@ -51,6 +58,8 @@ GEM
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 4.0)
       netrc (~> 0.8)
+    rmagick (2.16.0)
+    ruby-terminfo (0.1.1)
     sinatra (2.0.5)
       mustermann (~> 1.0)
       rack (~> 2.0)
@@ -60,6 +69,7 @@ GEM
       activerecord (>= 3.2)
       sinatra (>= 1.0)
     sqlite3 (1.4.1)
+    tco (0.1.8)
     thread_safe (0.3.6)
     tilt (2.0.9)
     tty-color (0.5.0)
@@ -89,8 +99,10 @@ PLATFORMS
 
 DEPENDENCIES
   activerecord
+  catpix
   faker
   json
+  mini_magick
   pry
   rake
   require_all
