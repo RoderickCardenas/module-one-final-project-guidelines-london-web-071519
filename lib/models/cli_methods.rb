@@ -93,9 +93,7 @@ end
 
 def my_games
     @current_user.reviews.each do |review|
-        @current_user.games.each do |game|
-            puts "", "Title: #{game.title} | Genre: #{game.genre} | Your review: #{review.content} | Your rating: #{review.rating}/10", ""
-        end
+        puts "", "Title: #{review.game.title} | Genre: #{review.game.genre} | Your review: #{review.content} | Your rating: #{review.rating}/10", ""
     end
     view_main_menu_logged_in
 end
